@@ -33,23 +33,22 @@ import com.dscoding.echojournal.core.presentation.designsystem.theme.EchoJournal
 
 @Composable
 fun MultiChoiceChip(
-    text: String,
+    displayText: String,
     onClick: () -> Unit,
     isClearVisible: Boolean,
     onClearButtonClick: () -> Unit,
     isHighlighted: Boolean,
     isDropDownVisible: Boolean,
     dropDownMenu: @Composable () -> Unit,
-    leadingContent: (@Composable () -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    leadingContent: (@Composable () -> Unit)? = null
 ) {
-    val containerColor = if (isHighlighted) {
+    val containerColor = if(isHighlighted) {
         MaterialTheme.colorScheme.surface
     } else {
         Transparent
     }
-
-    val borderColor = if (isHighlighted) {
+    val borderColor = if(isHighlighted) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
         MaterialTheme.colorScheme.outline
@@ -58,7 +57,7 @@ fun MultiChoiceChip(
     Box(
         modifier = modifier
             .then(
-                if (isHighlighted) {
+                if(isHighlighted) {
                     Modifier.shadow(
                         elevation = 4.dp,
                         shape = CircleShape
@@ -84,7 +83,7 @@ fun MultiChoiceChip(
         ) {
             leadingContent?.invoke()
             Text(
-                text = text,
+                text = displayText,
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.secondary
@@ -99,13 +98,13 @@ fun MultiChoiceChip(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(id = R.string.clear_selection),
+                        contentDescription = stringResource(R.string.clear_selection),
                         tint = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
             }
         }
-        if (isDropDownVisible) {
+        if(isDropDownVisible) {
             dropDownMenu()
         }
     }
@@ -113,22 +112,16 @@ fun MultiChoiceChip(
 
 @Preview
 @Composable
-fun MultiChoiceChipPreview() {
+private fun MultiChoiceChipPreview() {
     EchoJournalTheme {
         MultiChoiceChip(
-            text = "All topics",
+            displayText = "All topics",
             onClick = {},
             isClearVisible = true,
-            onClearButtonClick = { },
-            isHighlighted = true,
+            onClearButtonClick = {},
+            isHighlighted = false,
             isDropDownVisible = true,
             dropDownMenu = {},
-            leadingContent = {
-                Icon(
-                    imageVector = Icons.Default.Build,
-                    contentDescription = null
-                )
-            }
         )
     }
 }

@@ -98,7 +98,7 @@ fun MultiChoiceChip(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.clear_selection),
+                        contentDescription = stringResource(R.string.clear_selections),
                         tint = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }

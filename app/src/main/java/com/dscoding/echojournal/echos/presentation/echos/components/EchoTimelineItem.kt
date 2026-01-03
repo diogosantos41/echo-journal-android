@@ -46,9 +46,9 @@ fun EchoTimelineItem(
                 .fillMaxHeight(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if(relativePosition != RelativePosition.SINGLE_ENTRY) {
+            if (relativePosition != RelativePosition.SINGLE_ENTRY) {
                 VerticalDivider(
-                    modifier = when(relativePosition) {
+                    modifier = when (relativePosition) {
                         RelativePosition.FIRST -> noVerticalLineAboveIconModifier
                         RelativePosition.LAST -> noVerticalLineBelowIconModifier
                         RelativePosition.IN_BETWEEN -> Modifier

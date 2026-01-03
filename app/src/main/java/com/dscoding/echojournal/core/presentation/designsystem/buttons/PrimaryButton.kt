@@ -1,7 +1,6 @@
 package com.dscoding.echojournal.core.presentation.designsystem.buttons
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -14,9 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dscoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
@@ -30,22 +28,20 @@ fun PrimaryButton(
     enabled: Boolean = true,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
-
-    val contentColor = if(enabled) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.outline
-    }
-
     Button(
         onClick = onClick,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Transparent,
-            contentColor = contentColor
+            containerColor = Color.Transparent,
+            contentColor = if (enabled) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.outline
+            }
         ),
         modifier = modifier
             .background(
-                brush = if(enabled) {
+                brush = if (enabled) {
                     MaterialTheme.colorScheme.buttonGradient
                 } else {
                     SolidColor(MaterialTheme.colorScheme.surfaceVariant)
@@ -54,24 +50,29 @@ fun PrimaryButton(
             )
     ) {
         leadingIcon?.invoke()
-        if(leadingIcon != null) {
+
+        if (leadingIcon != null) {
             Spacer(modifier = Modifier.width(6.dp))
         }
+
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            color = contentColor,
-            textAlign = TextAlign.Center
+            color = if (enabled) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.outline
+            }
         )
     }
 }
 
 @Preview
 @Composable
-private fun PrimaryButtonPreview() {
+private fun SecondaryButtonPreview() {
     EchoJournalTheme {
         PrimaryButton(
-            text = "Hello World",
+            text = "Hello world!",
             onClick = {},
             leadingIcon = {
                 Icon(
@@ -79,7 +80,7 @@ private fun PrimaryButtonPreview() {
                     contentDescription = null
                 )
             },
-            enabled = true
+            enabled = false
         )
     }
 }

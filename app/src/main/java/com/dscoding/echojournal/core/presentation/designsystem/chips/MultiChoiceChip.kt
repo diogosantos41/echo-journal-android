@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,12 +42,12 @@ fun MultiChoiceChip(
     modifier: Modifier = Modifier,
     leadingContent: (@Composable () -> Unit)? = null
 ) {
-    val containerColor = if(isHighlighted) {
+    val containerColor = if (isHighlighted) {
         MaterialTheme.colorScheme.surface
     } else {
-        Transparent
+        Color.Transparent
     }
-    val borderColor = if(isHighlighted) {
+    val borderColor = if (isHighlighted) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
         MaterialTheme.colorScheme.outline
@@ -57,7 +56,7 @@ fun MultiChoiceChip(
     Box(
         modifier = modifier
             .then(
-                if(isHighlighted) {
+                if (isHighlighted) {
                     Modifier.shadow(
                         elevation = 4.dp,
                         shape = CircleShape
@@ -104,7 +103,7 @@ fun MultiChoiceChip(
                 }
             }
         }
-        if(isDropDownVisible) {
+        if (isDropDownVisible) {
             dropDownMenu()
         }
     }

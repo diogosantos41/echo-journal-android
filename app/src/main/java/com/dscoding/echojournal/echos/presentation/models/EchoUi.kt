@@ -2,8 +2,8 @@ package com.dscoding.echojournal.echos.presentation.models
 
 import com.dscoding.echojournal.echos.presentation.echos.models.PlaybackState
 import com.dscoding.echojournal.echos.presentation.util.toReadableTime
-import java.time.Instant as JavaInstant
 import kotlin.time.Duration
+import java.time.Instant as JavaInstant
 
 data class EchoUi(
     val id: Int,
@@ -14,6 +14,7 @@ data class EchoUi(
     val topics: List<String>,
     val amplitudes: List<Float>,
     val playbackTotalDuration: Duration,
+    val audioFilePath: String,
     val playbackCurrentDuration: Duration = Duration.ZERO,
     val playbackState: PlaybackState = PlaybackState.STOPPED
 ) {

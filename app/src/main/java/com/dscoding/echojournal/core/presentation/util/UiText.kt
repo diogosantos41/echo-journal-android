@@ -8,13 +8,13 @@ import androidx.compose.ui.res.stringResource
 
 @Stable
 sealed interface UiText {
-    data class Dynamic(val value: String): UiText
+    data class Dynamic(val value: String) : UiText
 
     @Stable
     data class StringResource(
         @StringRes val id: Int,
         val args: Array<Any> = arrayOf()
-    ): UiText {
+    ) : UiText {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -38,7 +38,7 @@ sealed interface UiText {
     data class Combined(
         val format: String,
         val uiTexts: Array<UiText>
-    ): UiText {
+    ) : UiText {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -60,12 +60,12 @@ sealed interface UiText {
 
     @Composable
     fun asString(): String {
-        return when(this) {
+        return when (this) {
             is Dynamic -> value
             is StringResource -> stringResource(id, *args)
             is Combined -> {
                 val strings = uiTexts.map { uiText ->
-                    when(uiText) {
+                    when (uiText) {
                         is Combined -> throw IllegalArgumentException("Can't nest combined UiTexts.")
                         is Dynamic -> uiText.value
                         is StringResource -> stringResource(uiText.id, *uiText.args)
@@ -77,12 +77,12 @@ sealed interface UiText {
     }
 
     fun asString(context: Context): String {
-        return when(this) {
+        return when (this) {
             is Dynamic -> value
             is StringResource -> context.getString(id, *args)
             is Combined -> {
                 val strings = uiTexts.map { uiText ->
-                    when(uiText) {
+                    when (uiText) {
                         is Combined -> throw IllegalArgumentException("Can't nest combined UiTexts.")
                         is Dynamic -> uiText.value
                         is StringResource -> context.getString(uiText.id, *uiText.args)

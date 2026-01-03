@@ -1,5 +1,10 @@
 package com.dscoding.echojournal.echos.presentation.echos
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,28 +15,82 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dscoding.echojournal.R
 import com.dscoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 import com.dscoding.echojournal.core.presentation.designsystem.theme.bgGradient
+import com.dscoding.echojournal.core.presentation.util.ObserveAsEvents
+import com.dscoding.echojournal.core.presentation.util.isAppInForeground
+import com.dscoding.echojournal.echos.domain.recording.RecordingDetails
 import com.dscoding.echojournal.echos.presentation.echos.components.EchoFilterRow
 import com.dscoding.echojournal.echos.presentation.echos.components.EchoList
-import com.dscoding.echojournal.echos.presentation.echos.components.EchoRecordFloatingActionButton
+import com.dscoding.echojournal.echos.presentation.echos.components.EchoQuickRecordFloatingActionButton
+import com.dscoding.echojournal.echos.presentation.echos.components.EchoRecordingSheet
 import com.dscoding.echojournal.echos.presentation.echos.components.EchosEmptyBackground
 import com.dscoding.echojournal.echos.presentation.echos.components.EchosTopBar
+import com.dscoding.echojournal.echos.presentation.echos.models.AudioCaptureMethod
+import com.dscoding.echojournal.echos.presentation.echos.models.RecordingState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EchosRoot(
-    viewModel: EchosViewModel = viewModel()
+    onNavigateToCreateEcho: (RecordingDetails) -> Unit,
+    onNavigateToSettings: () -> Unit,
+    viewModel: EchosViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted && state.currentCaptureMethod == AudioCaptureMethod.STANDARD) {
+            viewModel.onAction(EchosAction.OnAudioPermissionGranted)
+        }
+    }
+
+    val context = LocalContext.current
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is EchosEvent.RequestAudioPermission -> {
+                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+
+            is EchosEvent.RecordingTooShort -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.audio_recording_was_too_short),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            is EchosEvent.OnDoneRecording -> {
+                onNavigateToCreateEcho(event.details)
+            }
+        }
+    }
+
+    val isAppInForeground by isAppInForeground()
+    LaunchedEffect(isAppInForeground, state.recordingState) {
+        if (state.recordingState == RecordingState.NORMAL_CAPTURE && !isAppInForeground) {
+            viewModel.onAction(EchosAction.OnPauseRecordingClick)
+        }
+    }
+
     EchosScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when (action) {
+                is EchosAction.OnSettingsClick -> onNavigateToSettings()
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
@@ -40,11 +99,31 @@ fun EchosScreen(
     state: EchosState,
     onAction: (EchosAction) -> Unit,
 ) {
+    val context = LocalContext.current
     Scaffold(
         floatingActionButton = {
-            EchoRecordFloatingActionButton(
+            EchoQuickRecordFloatingActionButton(
                 onClick = {
-                    onAction(EchosAction.OnFabClick)
+                    onAction(EchosAction.OnRecordFabClick)
+                },
+                isQuickRecording = state.recordingState == RecordingState.QUICK_CAPTURE,
+                onLongPressEnd = { cancelledRecording ->
+                    if (cancelledRecording) {
+                        onAction(EchosAction.OnCancelRecording)
+                    } else {
+                        onAction(EchosAction.OnCompleteRecording)
+                    }
+                },
+                onLongPressStart = {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                    if (hasPermission) {
+                        onAction(EchosAction.OnRecordButtonLongClick)
+                    } else {
+                        onAction(EchosAction.OnRequestPermissionQuickRecording)
+                    }
                 }
             )
         },
@@ -102,7 +181,7 @@ fun EchosScreen(
                             onAction(EchosAction.OnPlayEchoClick(it))
                         },
                         onPauseClick = {
-                            onAction(EchosAction.OnPauseClick)
+                            onAction(EchosAction.OnPauseAudioClick)
                         },
                         onTrackSizeAvailable = { trackSize ->
                             onAction(EchosAction.OnTrackSizeAvailable(trackSize))
@@ -110,6 +189,17 @@ fun EchosScreen(
                     )
                 }
             }
+        }
+
+        if (state.recordingState in listOf(RecordingState.NORMAL_CAPTURE, RecordingState.PAUSED)) {
+            EchoRecordingSheet(
+                formattedRecordDuration = state.formattedRecordDuration,
+                isRecording = state.recordingState == RecordingState.NORMAL_CAPTURE,
+                onDismiss = { onAction(EchosAction.OnCancelRecording) },
+                onPauseClick = { onAction(EchosAction.OnPauseRecordingClick) },
+                onResumeClick = { onAction(EchosAction.OnResumeRecordingClick) },
+                onCompleteRecording = { onAction(EchosAction.OnCompleteRecording) },
+            )
         }
     }
 }

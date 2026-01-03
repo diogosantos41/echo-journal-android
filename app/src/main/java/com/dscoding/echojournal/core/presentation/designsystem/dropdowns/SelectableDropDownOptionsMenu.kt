@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.dscoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 import com.dscoding.echojournal.R
+import com.dscoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 
 @Composable
 fun <T> SelectableDropDownOptionsMenu(
@@ -79,7 +79,7 @@ fun <T> SelectableDropDownOptionsMenu(
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
                             .background(
-                                color = if(selectable.selected) {
+                                color = if (selectable.selected) {
                                     MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.05f)
                                 } else MaterialTheme.colorScheme.surface
                             )
@@ -95,7 +95,7 @@ fun <T> SelectableDropDownOptionsMenu(
                             text = itemDisplayText(selectable.item),
                             modifier = Modifier.weight(1f)
                         )
-                        if(selectable.selected) {
+                        if (selectable.selected) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
@@ -104,7 +104,7 @@ fun <T> SelectableDropDownOptionsMenu(
                         }
                     }
                 }
-                if(dropDownExtras != null && dropDownExtras.text.isNotEmpty()) {
+                if (dropDownExtras != null && dropDownExtras.text.isNotEmpty()) {
                     item(key = true) {
                         Row(
                             modifier = Modifier

@@ -39,7 +39,9 @@ fun TransparentHintTextField(
         maxLines = maxLines,
         singleLine = singleLine,
         decorationBox = { innerTextField ->
-            Box(contentAlignment = Alignment.CenterStart) {
+            Box(
+                contentAlignment = Alignment.CenterStart
+            ) {
                 if (text.isBlank() && hintText != null) {
                     Text(
                         text = hintText,
@@ -59,10 +61,9 @@ fun TransparentHintTextField(
 private fun TransparentHintTextFieldPreview() {
     EchoJournalTheme {
         TransparentHintTextField(
-            text = "Hello world!",
+            text = "",
             onValueChange = {},
             hintText = "Hint"
         )
     }
 }
-

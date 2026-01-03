@@ -27,7 +27,7 @@ fun EchoPlaybackButton(
     modifier: Modifier = Modifier
 ) {
     FilledIconButton(
-        onClick = when(playbackState) {
+        onClick = when (playbackState) {
             PlaybackState.PLAYING -> onPauseClick
             PlaybackState.PAUSED,
             PlaybackState.STOPPED -> onPlayClick
@@ -37,12 +37,12 @@ fun EchoPlaybackButton(
             .defaultShadow()
     ) {
         Icon(
-            imageVector = when(playbackState) {
+            imageVector = when (playbackState) {
                 PlaybackState.PLAYING -> Icons.Filled.Pause
                 PlaybackState.PAUSED,
                 PlaybackState.STOPPED -> Icons.Filled.PlayArrow
             },
-            contentDescription = when(playbackState) {
+            contentDescription = when (playbackState) {
                 PlaybackState.PLAYING -> stringResource(R.string.playing)
                 PlaybackState.PAUSED -> stringResource(R.string.paused)
                 PlaybackState.STOPPED -> stringResource(R.string.stopped)
